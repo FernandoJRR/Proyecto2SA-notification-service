@@ -37,12 +37,9 @@ public class SendGenericNotificationUseCase implements SendNotificationInputPort
 
         Objects.requireNonNull(notification.getClientId(), "El id del cliente es obligatorio");
 
-        /*
         String recipientEmail = getClientEmailOutputPort
                 .getRecipientEmail(notification.getClientId())
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
-         */
-        String recipientEmail = "kariasexual@tiffincrane.com";
 
         Map<String, Object> templateVariables = new HashMap<>();
         if (notification.getTemplateVariables() != null) {
