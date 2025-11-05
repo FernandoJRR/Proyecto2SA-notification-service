@@ -1,35 +1,30 @@
 package com.sa.notification_service.notifications.infrastructure.output.rest;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sa.notification_service.notifications.application.outputports.GetClientEmailOutputPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sa.notification_service.notifications.application.outputports.GetClientEmailOutputPort;
-
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class GetClientEmailAdapter implements GetClientEmailOutputPort {
 
     private final WebClient.Builder webClientBuilder;
-
-    @Value("${app.userURL}")
-    private String USER_SERVICE_URL;
+    private static final String USER_SERVICE_URL = "http://gateway/api/v1/users";
 
     @Override
     public Optional<String> getRecipientEmail(UUID clientId) {
-        final String requestUrl = USER_SERVICE_URL + "/api/v1/users/{clientId}";
+        final String requestUrl = USER_SERVICE_URL + "/" + clientId;
         try {
             Optional<ClientResponse> client = webClientBuilder.build().get()
-                .uri(requestUrl, clientId)
-                .retrieve()
-                .bodyToMono(ClientResponse.class)
-                .blockOptional();
+                    .uri(requestUrl)
+                    .retrieve()
+                    .bodyToMono(ClientResponse.class)
+                    .blockOptional();
 
             return client.map(ClientResponse::email);
         } catch (Exception ex) {
@@ -38,5 +33,6 @@ public class GetClientEmailAdapter implements GetClientEmailOutputPort {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record ClientResponse(String email) { }
+    private record ClientResponse(String email) {
+    }
 }
