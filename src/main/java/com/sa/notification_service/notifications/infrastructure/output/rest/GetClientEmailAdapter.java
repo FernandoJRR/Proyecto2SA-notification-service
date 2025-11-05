@@ -2,6 +2,7 @@ package com.sa.notification_service.notifications.infrastructure.output.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sa.notification_service.notifications.application.outputports.GetClientEmailOutputPort;
+import com.sa.notification_service.notifications.infrastructure.output.rest.dto.UserEmailResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,15 +19,15 @@ public class GetClientEmailAdapter implements GetClientEmailOutputPort {
 
     @Override
     public Optional<String> getRecipientEmail(UUID clientId) {
-        final String requestUrl = USER_SERVICE_URL + "/" + clientId;
+        final String requestUrl = USER_SERVICE_URL + "/public/email/" + clientId;
         try {
-            Optional<ClientResponse> client = webClientBuilder.build().get()
+            Optional<UserEmailResponseDTO> client = webClientBuilder.build().get()
                     .uri(requestUrl)
                     .retrieve()
-                    .bodyToMono(ClientResponse.class)
+                    .bodyToMono(UserEmailResponseDTO.class)
                     .blockOptional();
 
-            return client.map(ClientResponse::email);
+            return client.map(UserEmailResponseDTO::getEmail);
         } catch (Exception ex) {
             return Optional.empty();
         }
